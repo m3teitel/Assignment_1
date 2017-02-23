@@ -25,7 +25,7 @@ public class Appointment implements Comparable<Appointment> {
         description = des;
     }
     public String print(){
-        return Integer.toString(date.get(Calendar.HOUR_OF_DAY)) + Integer.toString(date.get(Calendar.MINUTE)) + description;
+        return Integer.toString(date.get(Calendar.HOUR_OF_DAY)) + ":" + Integer.toString(date.get(Calendar.MINUTE)) + " " + description;
     }
     public boolean occurson(int year, int month, int day, int hour, int minute) {
         Calendar comp = new GregorianCalendar(year, month, day, hour, minute);
