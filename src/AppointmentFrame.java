@@ -174,8 +174,13 @@ public class AppointmentFrame extends JFrame {
             int day = Integer.parseInt(d.getText());
             int month = Integer.parseInt(m.getText()) - 1;
             int year = Integer.parseInt(y.getText());
+            d.setText("");
+            m.setText("");
+            y.setText("");
             currentDate.set(year, month, day);
             jl.setText(sdf.format(currentDate.getTime()));
+            ta.setText("");
+            putAppt();
         }
     }
 
