@@ -1,3 +1,5 @@
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -7,6 +9,7 @@ import java.util.GregorianCalendar;
 public class Appointment implements Comparable<Appointment> {
     private Calendar date;
     private String description;
+    private DecimalFormat df = new DecimalFormat("##");
 
     public Appointment(int year, int month, int day, int hour, int minute, String description) {
         date = new GregorianCalendar(year, month, day, hour, minute);
@@ -30,7 +33,7 @@ public class Appointment implements Comparable<Appointment> {
     }
 
     public String print() {
-        return Integer.toString(date.get(Calendar.HOUR_OF_DAY)) + ":" + Integer.toString(date.get(Calendar.MINUTE)) + " " + description;
+        return String.format("%02d", date.get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", date.get(Calendar.MINUTE)) + " " + description;
     }
 
     public boolean occursOn(int year, int month, int day, int hour, int minute) {
