@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 
 /**
@@ -46,10 +47,8 @@ public class AppointmentFrame extends JFrame {
     private void createTextArea() {
         ta = new JTextArea();
         ta.setSize(400,500);
-        ta.setEditable(false); for (int i = 0; i > appointments.size(); i++) {
-            ta.append(appointments.toString());
-            ta.append("\n");
-        }
+        ta.setEditable(false);
+        putAppt();
         JScrollPane scrollPane = new JScrollPane(ta);
         scrollPane.createVerticalScrollBar();
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -164,18 +163,31 @@ public class AppointmentFrame extends JFrame {
     }
     class CreateListener implements ActionListener{
         public void actionPerformed(ActionEvent ae){
-            int day = currentDate.get(Calendar.DAY_OF_MONTH);
-            int month = currentDate.get(Calendar.MONTH) - 1;
-            int year = currentDate.get(Calendar.YEAR);
-            int hour = Integer.parseInt(h.getText());
-            int minute = 0;
-            if(!(min.getText().equals(""))){
-                minute = Integer.parseInt(min.getText());
+            apptDay();
+            ta.setText("");
+            putAppt();
+        }
+    }
+    private void apptDay(){
+        int day = currentDate.get(Calendar.DAY_OF_MONTH);
+        int month = currentDate.get(Calendar.MONTH) - 1;
+        int year = currentDate.get(Calendar.YEAR);
+        int hour = Integer.parseInt(h.getText());
+        int minute = 0;
+        if(!(min.getText().equals(""))){
+            minute = Integer.parseInt(min.getText());
+        }
+        String descrip = description.getText();
+        Appointment appt = new Appointment(year, month, day, hour, minute, descrip);
+        appointments.add(appt);
+        Collections.sort(appointments);
+    }
+    private void putAppt(){
+        for(int i = 0; i < appointments.size(); i++){
+            if(appointments.get(i).getDate().equals(currentDate)){
+                ta.append(appointments.get(i).print());
+                ta.append("\n");
             }
-            String descrip = description.getText();
-            Appointment appt = new Appointment(year, month, day, hour, minute, descrip);
-            appointments.add(appt);
-            ta.append(appt.print());
         }
     }
 }
