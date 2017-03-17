@@ -1,13 +1,12 @@
-import sun.awt.WindowClosingListener;
-
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.*;
-import java.nio.Buffer;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -194,7 +193,8 @@ public class AppointmentFrame extends JFrame {
             description.setText("");
         }
     }
-    class CancelListener implements ActionListener{
+
+    class CancelListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             int day = currentDate.get(Calendar.DAY_OF_MONTH);
@@ -205,8 +205,8 @@ public class AppointmentFrame extends JFrame {
             if (!(min.getText().equals(""))) {
                 minute = Integer.parseInt(min.getText());
             }
-            for(int i = 0; i < appointments.size(); i++){
-                if(appointments.get(i).occursOn(year, month, day, hour, minute)){
+            for (int i = 0; i < appointments.size(); i++) {
+                if (appointments.get(i).occursOn(year, month, day, hour, minute)) {
                     appointments.remove(i);
                 }
             }
@@ -241,81 +241,82 @@ public class AppointmentFrame extends JFrame {
                 ta.append(appointments.get(i).print());
                 ta.append("\n");
             }
-        }}
-
-        public void readFile(){
-            try {
-                FileReader in = new FileReader("Appointments.dat");
-                BufferedReader bin = new BufferedReader(in);
-                String line;
-                while ((line = bin.readLine()) != null) {
-                    System.out.println(line);
-                    String[] l = line.split("\\|");
-                    System.out.println(l[0] + l[1] + l[2] + l[3] + l[4] + l[5]);
-                    Appointment appt = new Appointment(Integer.parseInt(l[0]), Integer.parseInt(l[1]), Integer.parseInt(l[2]), Integer.parseInt(l[3]), Integer.parseInt(l[4]), l[5]);
-                    System.out.println(appt.print());
-                    appointments.add(appt);
-                }
-
-            } catch(Exception IOEx) {
-                System.out.println(IOEx.getMessage());
-            }
-    }
-class WL implements WindowListener {
-    public void windowClosing(WindowEvent e)
-    {
-        System.out.println("CLOSED");
-        FileWriter out;
-        BufferedWriter bout;
-        try {
-            out = new FileWriter("Appointments.dat");
-            bout = new BufferedWriter(out);
-            bout.write("");
-            for(int i = 0; i < appointments.size(); i++) {
-                bout.append(appointments.get(i).getDate().get(Calendar.YEAR) + "|"
-                        + appointments.get(i).getDate().get(Calendar.MONTH) + "|"
-                        + appointments.get(i).getDate().get(Calendar.DAY_OF_MONTH) + "|"
-                        + appointments.get(i).getDate().get(Calendar.HOUR_OF_DAY) + "|"
-                        + appointments.get(i).getDate().get(Calendar.MINUTE) + "|"
-                        + appointments.get(i).getDescription());
-                bout.newLine();
-            }
-            bout.close();
-            out.close();
-        } catch(IOException IOEx) {
-            JOptionPane.showMessageDialog(new JFrame(), IOEx.getMessage());
         }
     }
 
-    @Override
-    public void windowActivated(WindowEvent e) {
+    public void readFile() {
+        try {
+            FileReader in = new FileReader("Appointments.dat");
+            BufferedReader bin = new BufferedReader(in);
+            String line;
+            while ((line = bin.readLine()) != null) {
+                System.out.println(line);
+                String[] l = line.split("\\|");
+                System.out.println(l[0] + l[1] + l[2] + l[3] + l[4] + l[5]);
+                Appointment appt = new Appointment(Integer.parseInt(l[0]), Integer.parseInt(l[1]), Integer.parseInt(l[2]), Integer.parseInt(l[3]), Integer.parseInt(l[4]), l[5]);
+                System.out.println(appt.print());
+                appointments.add(appt);
+            }
 
+        } catch (Exception IOEx) {
+            System.out.println(IOEx.getMessage());
+        }
     }
 
-    @Override
-    public void windowClosed(WindowEvent e) {
+    class WL implements WindowListener {
+        public void windowClosing(WindowEvent e) {
+            System.out.println("CLOSED");
+            FileWriter out;
+            BufferedWriter bout;
+            try {
+                out = new FileWriter("Appointments.dat");
+                bout = new BufferedWriter(out);
+                bout.write("");
+                for (int i = 0; i < appointments.size(); i++) {
+                    bout.append(appointments.get(i).getDate().get(Calendar.YEAR) + "|"
+                            + appointments.get(i).getDate().get(Calendar.MONTH) + "|"
+                            + appointments.get(i).getDate().get(Calendar.DAY_OF_MONTH) + "|"
+                            + appointments.get(i).getDate().get(Calendar.HOUR_OF_DAY) + "|"
+                            + appointments.get(i).getDate().get(Calendar.MINUTE) + "|"
+                            + appointments.get(i).getDescription());
+                    bout.newLine();
+                }
+                bout.close();
+                out.close();
+            } catch (IOException IOEx) {
+                JOptionPane.showMessageDialog(new JFrame(), IOEx.getMessage());
+            }
+        }
 
-    }
+        @Override
+        public void windowActivated(WindowEvent e) {
 
-    @Override
-    public void windowDeactivated(WindowEvent e) {
+        }
 
-    }
+        @Override
+        public void windowClosed(WindowEvent e) {
 
-    @Override
-    public void windowDeiconified(WindowEvent e) {
+        }
 
-    }
+        @Override
+        public void windowDeactivated(WindowEvent e) {
 
-    @Override
-    public void windowIconified(WindowEvent e) {
+        }
 
-    }
+        @Override
+        public void windowDeiconified(WindowEvent e) {
 
-    @Override
-    public void windowOpened(WindowEvent e) {
+        }
 
+        @Override
+        public void windowIconified(WindowEvent e) {
+
+        }
+
+        @Override
+        public void windowOpened(WindowEvent e) {
+
+        }
     }
 }
-    }
 
