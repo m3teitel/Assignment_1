@@ -1,9 +1,6 @@
 import javax.swing.*;
-import java.io.IOException;
 
-/**
- * Created by Mike on 2017-02-21.
- */
+
 public class AppointmentViewer {
     public static void main(String[] args) {
         JFrame frame = new AppointmentFrame();

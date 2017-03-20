@@ -1,9 +1,7 @@
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-/**
- * Created by Mike on 21-Feb-17.
- */
+
 //Appointment Class taking the Year, Month, Day, Hour, Minute, and Description of an appointment
 public class Appointment implements Comparable<Appointment> {
     //Instance Variables of the Date and Description of the appointment

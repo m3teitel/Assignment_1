@@ -2,37 +2,31 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
+import java.util.*;
 
-/**
- * Created by Mike on 2017-02-21.
- */
+
 public class AppointmentFrame extends JFrame {
+    //Instance Variables
     private static int FRAME_WIDTH = 400;
     private static int FRAME_HEIGHT = 1000;
     private Calendar currentDate;
-    private JLabel jl, year, month, day, hour, minute, descrip;
+    private JLabel currentDateLabel, year, month, day, hour, minute, descrip;
     private SimpleDateFormat sdf;
     private ArrayList<Appointment> appointments;
-    private JTextArea ta;
-    private JScrollBar sb;
-    private JPanel cp, dp, ap, but, da, time, but2, desc;
+    private JTextArea appointmentsTextArea;
+    private JScrollPane scrollPane;
+    private JPanel ctrlPanel, datePanel, appointmentPanel, but, da, time, but2, desc;
     private JButton next, previous, show, create, cancel;
     private JTextField d, m, y, h, min, description;
 
+    //Constructor method calling all other methods to create the frame
     public AppointmentFrame() {
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         this.setLayout(new BorderLayout());
-        appointments = new ArrayList<Appointment>();
+        appointments = new ArrayList<>();
         WindowListener wl = new WL();
         addWindowListener(wl);
         readFile();
@@ -42,47 +36,50 @@ public class AppointmentFrame extends JFrame {
 
     }
 
-    //Done Don't Touch
+    //Method to get the current date label at the top of the panel
     private void createDate() {
         currentDate = new GregorianCalendar();
         sdf = new SimpleDateFormat("EEEE MMMM dd, yyyy");
-        jl = new JLabel(sdf.format(currentDate.getTime()));
-        add(jl, BorderLayout.NORTH);
+        currentDateLabel = new JLabel(sdf.format(currentDate.getTime()));
+        add(currentDateLabel, BorderLayout.NORTH);
 
     }
 
+    //Method to create the text area to show all of the daily appointments
     private void createTextArea() {
-        ta = new JTextArea();
-        ta.setSize(400, 500);
-        //ta.setEditable(false);
+        appointmentsTextArea = new JTextArea();
+        appointmentsTextArea.setSize(400, 500);
+        appointmentsTextArea.setEditable(false);
         putAppt();
-        JScrollPane scrollPane = new JScrollPane(ta);
+        scrollPane = new JScrollPane(appointmentsTextArea);
         scrollPane.createVerticalScrollBar();
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    //Method to create a panel to hold the interactive part of the GUI
     private void createControlPanel() {
-        cp = new JPanel();
-        cp.setLayout(new GridLayout(2, 1));
+        ctrlPanel = new JPanel();
+        ctrlPanel.setLayout(new GridLayout(2, 1));
         createDatePanel();
-        cp.add(dp);
+        ctrlPanel.add(datePanel);
         createAddApptPanel();
-        cp.add(ap);
-        add(cp, BorderLayout.SOUTH);
+        ctrlPanel.add(appointmentPanel);
+        add(ctrlPanel, BorderLayout.SOUTH);
 
 
     }
 
+    //Method to create the panel that holds the options for setting the current date
     private void createDatePanel() {
         year = new JLabel("Year:");
         month = new JLabel("Month:");
         day = new JLabel("Day:");
         show = new JButton("Show");
-        dp = new JPanel();
-        dp.setLayout(new GridLayout(3, 1));
-        dp.setBorder(new TitledBorder(new EtchedBorder(), "Date"));
+        datePanel = new JPanel();
+        datePanel.setLayout(new GridLayout(3, 1));
+        datePanel.setBorder(new TitledBorder(new EtchedBorder(), "Date"));
         but = new JPanel();
         da = new JPanel(new GridLayout(1, 3));
         next = new JButton(">");
@@ -109,15 +106,17 @@ public class AppointmentFrame extends JFrame {
         da.add(m);
         da.add(day);
         da.add(d);
-        dp.add(but, 0);
-        dp.add(da, 1);
-        dp.add(show, 2);
+        datePanel.add(but, 0);
+        datePanel.add(da, 1);
+        datePanel.add(show, 2);
 
     }
 
+    //Method that creates the panel that holds the options to add appointments to the current date
     private void createAddApptPanel() {
-        ap = new JPanel();
-        ap.setLayout(new GridLayout(3, 1));
+        appointmentPanel = new JPanel();
+        appointmentPanel.setLayout(new GridLayout(3, 1));
+        appointmentPanel.setBorder(new TitledBorder(new EtchedBorder(), "Create"));
         time = new JPanel();
         time.setLayout(new GridLayout(1, 2));
         but2 = new JPanel();
@@ -144,106 +143,13 @@ public class AppointmentFrame extends JFrame {
         but2.add(cancel);
         desc.add(descrip);
         desc.add(description);
-        ap.add(time);
-        ap.add(desc);
-        ap.add(but2);
+        appointmentPanel.add(time);
+        appointmentPanel.add(desc);
+        appointmentPanel.add(but2);
 
     }
 
-    class PreviousListener implements ActionListener {
-        public void actionPerformed(ActionEvent ae) {
-            currentDate.add(Calendar.DAY_OF_MONTH, -1);
-            jl.setText(sdf.format(currentDate.getTime()));
-            ta.setText("");
-            putAppt();
-        }
-    }
-
-    class NextListener implements ActionListener {
-        public void actionPerformed(ActionEvent ae) {
-            currentDate.add(Calendar.DAY_OF_MONTH, 1);
-            jl.setText(sdf.format(currentDate.getTime()));
-            ta.setText("");
-            putAppt();
-        }
-    }
-
-    class ShowListener implements ActionListener {
-        public void actionPerformed(ActionEvent ae) {
-            int day = Integer.parseInt(d.getText());
-            int month = Integer.parseInt(m.getText()) - 1;
-            int year = Integer.parseInt(y.getText());
-            d.setText("");
-            m.setText("");
-            y.setText("");
-            currentDate.set(year, month, day);
-            jl.setText(sdf.format(currentDate.getTime()));
-            ta.setText("");
-            putAppt();
-        }
-    }
-
-    class CreateListener implements ActionListener {
-        public void actionPerformed(ActionEvent ae) {
-            apptDay();
-            ta.setText("");
-            putAppt();
-            h.setText("");
-            min.setText("");
-            description.setText("");
-        }
-    }
-
-    class CancelListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int day = currentDate.get(Calendar.DAY_OF_MONTH);
-            int month = currentDate.get(Calendar.MONTH);
-            int year = currentDate.get(Calendar.YEAR);
-            int hour = Integer.parseInt(h.getText());
-            int minute = 0;
-            if (!(min.getText().equals(""))) {
-                minute = Integer.parseInt(min.getText());
-            }
-            for (int i = 0; i < appointments.size(); i++) {
-                if (appointments.get(i).occursOn(year, month, day, hour, minute)) {
-                    appointments.remove(i);
-                }
-            }
-            ta.setText("");
-            putAppt();
-            h.setText("");
-            min.setText("");
-            description.setText("");
-        }
-    }
-
-    private void apptDay() {
-        int day = currentDate.get(Calendar.DAY_OF_MONTH);
-        int month = currentDate.get(Calendar.MONTH);
-        int year = currentDate.get(Calendar.YEAR);
-        int hour = Integer.parseInt(h.getText());
-        int minute = 0;
-        if (!(min.getText().equals(""))) {
-            minute = Integer.parseInt(min.getText());
-        }
-        String descrip = description.getText();
-        Appointment appt = new Appointment(year, month, day, hour, minute, descrip);
-        appointments.add(appt);
-        Collections.sort(appointments);
-    }
-
-    private void putAppt() {
-        for (int i = 0; i < appointments.size(); i++) {
-            if (appointments.get(i).getDate().get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH) &&
-                    appointments.get(i).getDate().get(Calendar.MONTH) == currentDate.get(Calendar.MONTH) &&
-                    appointments.get(i).getDate().get(Calendar.YEAR) == currentDate.get(Calendar.YEAR)) {
-                ta.append(appointments.get(i).print());
-                ta.append("\n");
-            }
-        }
-    }
-
+    //Method to read from a data file with the appointments and add them all to the ArrayList
     public void readFile() {
         try {
             FileReader in = new FileReader("Appointments.dat");
@@ -257,13 +163,134 @@ public class AppointmentFrame extends JFrame {
                 System.out.println(appt.print());
                 appointments.add(appt);
             }
-
+            in.close();
+            bin.close();
         } catch (Exception IOEx) {
-            System.out.println(IOEx.getMessage());
+            JOptionPane.showMessageDialog(new JFrame(), "Previous Data is Unavailable");
         }
     }
 
+    //Mehtod to get the new appointment based on the values entered and adds it to the ArrayList
+    private void apptDay() {
+        int day = currentDate.get(Calendar.DAY_OF_MONTH);
+        int month = currentDate.get(Calendar.MONTH);
+        int year = currentDate.get(Calendar.YEAR);
+        int hour = Integer.parseInt(h.getText());
+        int minute = 0;
+        boolean doesntExists = true;
+        String descrip = description.getText();
+        if (!(min.getText().equals(""))) {
+            minute = Integer.parseInt(min.getText());
+        }
+        Appointment appt = new Appointment(year, month, day, hour, minute, descrip);
+        for (int i = 0; i < appointments.size(); i++) {
+            if (appointments.get(i).compareTo(appt) == 0)
+                doesntExists = false;
+        }
+        if (doesntExists) {
+
+            appointments.add(appt);
+        } else {
+            JOptionPane.showMessageDialog(new JFrame(), "Error:\nAppoointment at that time already exists.");
+        }
+
+        Collections.sort(appointments);
+    }
+
+    //Method to display the appointments in the TextArea
+    private void putAppt() {
+        for (int i = 0; i < appointments.size(); i++) {
+            if (appointments.get(i).getDate().get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH) &&
+                    appointments.get(i).getDate().get(Calendar.MONTH) == currentDate.get(Calendar.MONTH) &&
+                    appointments.get(i).getDate().get(Calendar.YEAR) == currentDate.get(Calendar.YEAR)) {
+                appointmentsTextArea.append(appointments.get(i).print());
+                appointmentsTextArea.append("\n");
+            }
+        }
+    }
+
+    //ActionListener class for the previous date button
+    class PreviousListener implements ActionListener {
+        public void actionPerformed(ActionEvent ae) {
+            currentDate.add(Calendar.DAY_OF_MONTH, -1);
+            currentDateLabel.setText(sdf.format(currentDate.getTime()));
+            appointmentsTextArea.setText("");
+            putAppt();
+        }
+    }
+
+    //ActionListener class for the next date button
+    class NextListener implements ActionListener {
+        public void actionPerformed(ActionEvent ae) {
+            currentDate.add(Calendar.DAY_OF_MONTH, 1);
+            currentDateLabel.setText(sdf.format(currentDate.getTime()));
+            appointmentsTextArea.setText("");
+            putAppt();
+        }
+    }
+
+    //ActionListener for the show button which sets the current date to the value entered
+    class ShowListener implements ActionListener {
+        public void actionPerformed(ActionEvent ae) {
+            int day = Integer.parseInt(d.getText());
+            int month = Integer.parseInt(m.getText()) - 1;
+            int year = Integer.parseInt(y.getText());
+            d.setText("");
+            m.setText("");
+            y.setText("");
+            currentDate.set(year, month, day);
+            currentDateLabel.setText(sdf.format(currentDate.getTime()));
+            appointmentsTextArea.setText("");
+            putAppt();
+        }
+    }
+
+    //ActionListener for the Create button which creates the appointment based on the values entered and the current date
+    class CreateListener implements ActionListener {
+        public void actionPerformed(ActionEvent ae) {
+            apptDay();
+            appointmentsTextArea.setText("");
+            putAppt();
+            h.setText("");
+            min.setText("");
+            description.setText("");
+        }
+    }
+
+    //ActionListener for the Cancel button which cancels the appointment based ont he current date and the values entered
+    class CancelListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int day = currentDate.get(Calendar.DAY_OF_MONTH);
+            int month = currentDate.get(Calendar.MONTH);
+            int year = currentDate.get(Calendar.YEAR);
+            int hour = Integer.parseInt(h.getText());
+            int minute = 0;
+            boolean notRemoved = true;
+            if (!(min.getText().equals(""))) {
+                minute = Integer.parseInt(min.getText());
+            }
+            for (int i = 0; i < appointments.size(); i++) {
+                if (appointments.get(i).occursOn(year, month, day, hour, minute)) {
+                    appointments.remove(i);
+                    notRemoved = false;
+                }
+            }
+            if (notRemoved) {
+                JOptionPane.showMessageDialog(new JFrame(), "Error:\nNo Appointment at that time.");
+            }
+            appointmentsTextArea.setText("");
+            putAppt();
+            h.setText("");
+            min.setText("");
+            description.setText("");
+        }
+    }
+
+
+    //Class which handles window events
     class WL implements WindowListener {
+        //Method triggered when the window is closing, takes all of the appointments in the ArrayList and stores it in a data file
         public void windowClosing(WindowEvent e) {
             System.out.println("CLOSED");
             FileWriter out;
@@ -284,39 +311,16 @@ public class AppointmentFrame extends JFrame {
                 bout.close();
                 out.close();
             } catch (IOException IOEx) {
-                JOptionPane.showMessageDialog(new JFrame(), IOEx.getMessage());
+                JOptionPane.showMessageDialog(new JFrame(), "Error: writing to file");
             }
         }
-
         @Override
-        public void windowActivated(WindowEvent e) {
-
-        }
-
-        @Override
-        public void windowClosed(WindowEvent e) {
-
-        }
-
-        @Override
-        public void windowDeactivated(WindowEvent e) {
-
-        }
-
-        @Override
-        public void windowDeiconified(WindowEvent e) {
-
-        }
-
-        @Override
-        public void windowIconified(WindowEvent e) {
-
-        }
-
-        @Override
-        public void windowOpened(WindowEvent e) {
-
-        }
+        public void windowActivated(WindowEvent e) {}
+        public void windowClosed(WindowEvent e) {}
+        public void windowDeactivated(WindowEvent e) {}
+        public void windowDeiconified(WindowEvent e) {}
+        public void windowIconified(WindowEvent e) {}
+        public void windowOpened(WindowEvent e) {}
     }
 }
 
