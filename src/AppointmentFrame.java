@@ -1,3 +1,6 @@
+//Name: Michael Teitelbaum
+//Student ID: 500747561
+
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
