@@ -5,16 +5,13 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
+import java.util.*;
 
 
-public class AppointmentFrame extends JFrame {
+public class AppointmentFrameFiles extends JFrame {
     //Instance Variables
     private static int FRAME_WIDTH = 400;
     private static int FRAME_HEIGHT = 1000;
@@ -29,17 +26,14 @@ public class AppointmentFrame extends JFrame {
     private JTextField d, m, y, h, min, description;
 
     //Constructor method calling all other methods to create the frame
-    public AppointmentFrame() {
+    public AppointmentFrameFiles() {
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         this.setLayout(new BorderLayout());
         appointments = new ArrayList<>();
+        WindowListener wl = new WL();
+        addWindowListener(wl);
+        readFile();
         createDate();
-        Appointment test1 = new Appointment(currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH), 10, 00, "Dentist");
-        Appointment test2 = new Appointment(currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH), 12, 15, "Work");
-        Appointment test3 = new Appointment(currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH), 21, 30, "Dinner With Karen");
-        appointments.add(test1);
-        appointments.add(test2);
-        appointments.add(test3);
         createTextArea();
         createControlPanel();
 
@@ -158,6 +152,26 @@ public class AppointmentFrame extends JFrame {
 
     }
 
+    //Method to read from a data file with the appointments and add them all to the ArrayList
+    public void readFile() {
+        try {
+            FileReader in = new FileReader("Appointments.dat");
+            BufferedReader bin = new BufferedReader(in);
+            String line;
+            while ((line = bin.readLine()) != null) {
+                System.out.println(line);
+                String[] l = line.split("\\|");
+                System.out.println(l[0] + l[1] + l[2] + l[3] + l[4] + l[5]);
+                Appointment appt = new Appointment(Integer.parseInt(l[0]), Integer.parseInt(l[1]), Integer.parseInt(l[2]), Integer.parseInt(l[3]), Integer.parseInt(l[4]), l[5]);
+                System.out.println(appt.print());
+                appointments.add(appt);
+            }
+            in.close();
+            bin.close();
+        } catch (Exception IOEx) {
+            JOptionPane.showMessageDialog(new JFrame(), "Previous Data is Unavailable");
+        }
+    }
 
     //Method to get the new appointment based on the values entered and adds it to the ArrayList
     private void apptDay() {
@@ -197,6 +211,7 @@ public class AppointmentFrame extends JFrame {
             }
         }
     }
+
 
     //ActionListener class for the previous date button
     class PreviousListener implements ActionListener {
@@ -277,6 +292,40 @@ public class AppointmentFrame extends JFrame {
     }
 
 
-
+    //Class which handles window events
+    class WL implements WindowListener {
+        //Method triggered when the window is closing, takes all of the appointments in the ArrayList and stores it in a data file
+        public void windowClosing(WindowEvent e) {
+            System.out.println("CLOSED");
+            FileWriter out;
+            BufferedWriter bout;
+            try {
+                out = new FileWriter("Appointments.dat");
+                bout = new BufferedWriter(out);
+                bout.write("");
+                for (int i = 0; i < appointments.size(); i++) {
+                    bout.append(appointments.get(i).getDate().get(Calendar.YEAR) + "|"
+                            + appointments.get(i).getDate().get(Calendar.MONTH) + "|"
+                            + appointments.get(i).getDate().get(Calendar.DAY_OF_MONTH) + "|"
+                            + appointments.get(i).getDate().get(Calendar.HOUR_OF_DAY) + "|"
+                            + appointments.get(i).getDate().get(Calendar.MINUTE) + "|"
+                            + appointments.get(i).getDescription());
+                    bout.newLine();
+                }
+                bout.close();
+                out.close();
+            } catch (IOException IOEx) {
+                JOptionPane.showMessageDialog(new JFrame(), "Error: writing to file");
+            }
+        }
+        @Override
+        //Unused methods for the interface
+        public void windowActivated(WindowEvent e) {}
+        public void windowClosed(WindowEvent e) {}
+        public void windowDeactivated(WindowEvent e) {}
+        public void windowDeiconified(WindowEvent e) {}
+        public void windowIconified(WindowEvent e) {}
+        public void windowOpened(WindowEvent e) {}
+    }
 }
 
